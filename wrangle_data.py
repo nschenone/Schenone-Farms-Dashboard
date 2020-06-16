@@ -2,6 +2,28 @@ import pandas as pd
 import plotly.graph_objs as go
 
 
+def get_df(path):
+    # Read CSV
+    df = pd.read_csv(path)
+
+    # Set column datatypes
+    df['Date'] =  pd.to_datetime(df['Date'])
+    df['Field Tag'] =  pd.to_numeric(df['Field Tag'])
+    df['Receiving Tag'] =  pd.to_numeric(df['Receiving Tag'])
+    df['Lot'] =  pd.to_numeric(df['Lot'])
+    df['Bins Received'] =  pd.to_numeric(df['Bins Received'])
+    df['Bucket Price'] =  pd.to_numeric([i.strip()[1:] for i in df['Bucket Price']])
+    df['Bucket Weight'] =  pd.to_numeric(df['Bucket Weight'])
+    df['Price/Lb For Picker'] =  pd.to_numeric(df['Price/Lb For Picker'])
+    df['Charge w 40%'] =  pd.to_numeric(df['Charge w 40%'])
+    df['Weight (Dumped) By Field Tag'] =  pd.to_numeric([i.replace(",", "") for i in df['Weight (Dumped) By Field Tag']])
+    df['Picking Charge'] =  pd.to_numeric([i.strip()[1:].replace(",", "") for i in df['Picking Charge']])
+    df['Crew Cost (Per Lb)'] =  pd.to_numeric([i.strip()[1:] for i in df['Crew Cost (Per Lb)']])
+    df['Crew Cost (Subtotal)'] =  pd.to_numeric([i.strip()[1:] for i in df['Crew Cost (Subtotal)']])
+    
+    return df
+
+
 
 def return_figures():
     """Creates four plotly visualizations
@@ -14,21 +36,22 @@ def return_figures():
 
     """
 
-
+    df = get_df("myapp/data/Sample.csv")
     
+    df_query = df[df["Variety"] == "Coral"]
     graph_one = []    
     graph_one.append(
       go.Scatter(
-      x = [0, 1, 2, 3, 4, 5],
-      y = [0, 2, 4, 6, 8, 10],
+      x = df_query['Date'],
+      y = df_query["Crew Cost (Subtotal)"],
       mode = 'lines'
       )
     )
 
-    layout_one = dict(title = 'Chart One',
-                xaxis = dict(title = 'x-axis label'),
-                yaxis = dict(title = 'y-axis label'),
-                )
+    layout_one = dict(title = 'Crew Cost Over Time (Coral)',
+                xaxis = dict(title = 'Date'),
+                yaxis = dict(title = 'Crew Cost (Subtotal)'),
+    )
   
     graph_two = []
 
